@@ -49,4 +49,12 @@ dependencies {
     implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
     implementation 'io.github.shashank02051997:FancyToast:2.0.2'
 
+    //sheet
+//    implementation 'com.maxkeppeler.sheets:input:2.2.9'
+    implementation 'com.maxkeppeler.sheets:info:2.2.9'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
+
+
+
+
 }

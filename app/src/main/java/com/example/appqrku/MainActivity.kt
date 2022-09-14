@@ -1,29 +1,39 @@
 package com.example.appqrku
 
 import android.Manifest
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Window
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.example.appqrku.databinding.ActivityMainBinding
-import com.shashank.sony.fancytoastlib.FancyToast
+import com.maxkeppeler.sheets.info.InfoSheet
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
     private lateinit var codeScanner : CodeScanner
+    private lateinit var viewModel : MainVIewModel
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+
+        //Get permision
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
                 this,
@@ -31,6 +41,14 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_CODE_PERMISSIONS
             )
         }
+
+        //view model
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[MainVIewModel::class.java]
+
+        viewModel.result.observe(this){resultQR->
+            binding.txtResultScann.text = resultQR.toString()
+        }
+        //QR
         codeScanner = CodeScanner(this, binding.scannerView)
         // Parameters (default values)
         codeScanner.camera = CodeScanner.CAMERA_BACK // or CAMERA_FRONT or specific camera id
@@ -43,7 +61,8 @@ class MainActivity : AppCompatActivity() {
 
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread{
-                Toast.makeText(this, "scan result ${it.text}", Toast.LENGTH_SHORT).show()
+                viewModel.setData(it.text)
+                infoSheet(it.text)
             }
         }
 
@@ -53,13 +72,54 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.scannerView.setOnClickListener{
-            codeScanner.startPreview()
-        }
+//        binding.scannerView.setOnClickListener{
+//            codeScanner.startPreview()
+//        }
 
         binding.btnScann.setOnClickListener {
             codeScanner.startPreview()
+            viewModel.setData("...")
         }
+    }
+
+//    private fun sheet(){
+//        InputSheet().show(this){
+//            title("Result QR Code")
+//            with(InputEditText{
+//                required()
+//                label("Result")
+//                defaultValue("AAAAA")
+//
+//            })
+//        }
+//    }
+
+    private fun infoSheet(msg : String){
+        InfoSheet().show(this){
+            title("Go To Result QR Scan")
+            content("Result QR : $msg")
+
+            onPositive("Go") {
+                move(msg)
+            }
+
+            onNegative ("Cancel") {
+                Toast.makeText(this@MainActivity, "Not action", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun move(content : String){
+        val move : Intent = Uri.parse(content.toString()).let { web ->
+            Intent(Intent.ACTION_VIEW, web)
+        }
+
+        try {
+            startActivity(move)
+        }catch (e : ActivityNotFoundException){
+            Toast.makeText(this, "Message error ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
 //    override fun onResume() {
