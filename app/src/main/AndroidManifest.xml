@@ -3,10 +3,12 @@
     package="com.example.appqrku">
 
     <uses-permission android:name="android.permission.CAMERA"/>
-
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false"/>
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="true" />
 
     <application
         android:allowBackup="true"

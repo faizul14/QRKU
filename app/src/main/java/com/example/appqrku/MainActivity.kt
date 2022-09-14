@@ -1,8 +1,13 @@
 package com.example.appqrku
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Window
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
@@ -19,6 +24,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+        if (!allPermissionsGranted()) {
+            ActivityCompat.requestPermissions(
+                this,
+                REQUIRED_PERMISSIONS,
+                REQUEST_CODE_PERMISSIONS
+            )
+        }
         codeScanner = CodeScanner(this, binding.scannerView)
         // Parameters (default values)
         codeScanner.camera = CodeScanner.CAMERA_BACK // or CAMERA_FRONT or specific camera id
@@ -58,5 +70,32 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         codeScanner.releaseResources()
         super.onDestroy()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (!allPermissionsGranted()) {
+                Toast.makeText(
+                    this,
+                    "Tidak mendapatkan permission.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }
+        }
+    }
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    companion object {
+        const val CAMERA_X_RESULT = 200
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val REQUEST_CODE_PERMISSIONS = 10
     }
 }
