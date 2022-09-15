@@ -80,7 +80,6 @@ class MainActivity : AppCompatActivity() {
         binding.btnScann.setOnClickListener {
             codeScanner.startPreview()
             viewModel.setData("...")
-            infoSheet("aaa")
         }
     }
 
