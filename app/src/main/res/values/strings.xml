@@ -2,4 +2,5 @@
     <string name="app_name">App QRKU</string>
     <string name="lorem_ipsum_dolor_is_amet">...</string>
     <string name="scan_qr_code">Scan QR Code</string>
+    <string name="tittel_sheet">Go To Result QR Scan</string>
 </resources>

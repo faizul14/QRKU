@@ -1,10 +1,10 @@
 package com.example.appqrku
 
 import android.Manifest
-import android.content.ActivityNotFoundException
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Window
@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_CODE_PERMISSIONS
             )
         }
+
 
         //view model
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[MainVIewModel::class.java]
@@ -79,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnScann.setOnClickListener {
             codeScanner.startPreview()
             viewModel.setData("...")
+            infoSheet("aaa")
         }
     }
 
@@ -103,8 +105,10 @@ class MainActivity : AppCompatActivity() {
                 move(msg)
             }
 
-            onNegative ("Cancel") {
-                Toast.makeText(this@MainActivity, "Not action", Toast.LENGTH_SHORT).show()
+            onNegative ("COPY") {
+                val clipBoard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipBoard.setPrimaryClip(ClipData.newPlainText("", msg))
+                Toast.makeText(this@MainActivity, "Text $msg berhasil di copy", Toast.LENGTH_SHORT).show()
             }
         }
     }
