@@ -9,7 +9,10 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Window
+import android.view.WindowInsets
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -39,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+        hideSystemUI()
 
         //Get permision
         if (!allPermissionsGranted()) {
@@ -93,18 +97,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun sheet(){
-//        InputSheet().show(this){
-//            title("Result QR Code")
-//            with(InputEditText{
-//                required()
-//                label("Result")
-//                defaultValue("AAAAA")
-//
-//            })
-//        }
-//    }
-
     private fun infoSheet(msg : String){
         InfoSheet().show(this){
             title("Go To Result QR Scan")
@@ -136,7 +128,6 @@ class MainActivity : AppCompatActivity() {
     private fun copy(msg: String){
         val clipBoard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipBoard.setPrimaryClip(ClipData.newPlainText("", msg))
-        Toast.makeText(this@MainActivity, "Text $msg berhasil di copy", Toast.LENGTH_SHORT).show()
     }
 
     private fun optionSheet(msg : String){
@@ -222,6 +213,23 @@ class MainActivity : AppCompatActivity() {
     }
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    //for hide top bar
+    private fun hideSystemUI() {
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.insetsController?.hide(WindowInsets.Type.statusBars())
+            }
+        }
+//        else {
+//            window.setFlags(
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN
+//            )
+//        }
+//        supportActionBar?.hide()
     }
 
     companion object {
