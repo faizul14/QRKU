@@ -3,6 +3,7 @@ package com.example.appqrku
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import android.view.Window
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
@@ -19,6 +21,11 @@ import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.example.appqrku.databinding.ActivityMainBinding
 import com.maxkeppeler.sheets.info.InfoSheet
+import com.maxkeppeler.sheets.options.DisplayMode
+import com.maxkeppeler.sheets.options.Option
+import com.maxkeppeler.sheets.options.OptionsSheet
+import www.sanju.motiontoast.MotionToast
+import www.sanju.motiontoast.MotionToastStyle
 
 
 class MainActivity : AppCompatActivity() {
@@ -43,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+
         //view model
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[MainVIewModel::class.java]
 
@@ -63,7 +71,8 @@ class MainActivity : AppCompatActivity() {
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread{
                 viewModel.setData(it.text)
-                infoSheet(it.text)
+//                infoSheet(it.text)
+                optionSheet(it.text)
             }
         }
 
@@ -80,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnScann.setOnClickListener {
             codeScanner.startPreview()
             viewModel.setData("...")
+
         }
     }
 
@@ -105,9 +115,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             onNegative ("COPY") {
-                val clipBoard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipBoard.setPrimaryClip(ClipData.newPlainText("", msg))
-                Toast.makeText(this@MainActivity, "Text $msg berhasil di copy", Toast.LENGTH_SHORT).show()
+               copy(msg)
             }
         }
     }
@@ -125,6 +133,70 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun copy(msg: String){
+        val clipBoard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipBoard.setPrimaryClip(ClipData.newPlainText("", msg))
+        Toast.makeText(this@MainActivity, "Text $msg berhasil di copy", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun optionSheet(msg : String){
+        OptionsSheet().show(this){
+            title("Go To Result QR Scan")
+            displayMode(DisplayMode.LIST)
+            preventIconTint(true)
+            with(
+                Option(R.drawable.ic_baseline_content_copy_24, "COPY"),
+                Option(R.drawable.ic_baseline_send_24, "GO")
+            )
+
+            onPositive{Index : Int, option: Option ->
+                when(Index){
+                    0 -> {
+                        copy(msg)
+                        toast(info)
+                    }
+                    1 -> {
+                        move(msg)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun toast(type : String){
+
+        when(type){
+            succes -> {
+                MotionToast.createToast(this,
+                    "Hurray success 😍",
+                    "Upload Completed successfully!",
+                    MotionToastStyle.SUCCESS,
+                    MotionToast.GRAVITY_BOTTOM,
+                    MotionToast.LONG_DURATION,
+                    ResourcesCompat.getFont(this, www.sanju.motiontoast.R.font.helvetica_regular))
+            }
+            info-> {
+                MotionToast.createToast(this,
+                    "INFO",
+                    "Succes Copy!",
+                    MotionToastStyle.INFO,
+                    MotionToast.GRAVITY_BOTTOM,
+                    MotionToast.LONG_DURATION,
+                    ResourcesCompat.getFont(this, www.sanju.motiontoast.R.font.helvetica_regular))
+            }
+            warning -> {
+                MotionToast.createToast(this,
+                    "Warning",
+                    "Note Have Permision",
+                    MotionToastStyle.WARNING,
+                    MotionToast.GRAVITY_BOTTOM,
+                    MotionToast.LONG_DURATION,
+                    ResourcesCompat.getFont(this, www.sanju.motiontoast.R.font.helvetica_regular))
+            }
+
+        }
+
+    }
 //    override fun onResume() {
 //        super.onResume()
 //        codeScanner.startPreview()
@@ -143,11 +215,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (!allPermissionsGranted()) {
-                Toast.makeText(
-                    this,
-                    "Tidak mendapatkan permission.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                toast(warning)
                 finish()
             }
         }
@@ -160,5 +228,9 @@ class MainActivity : AppCompatActivity() {
         const val CAMERA_X_RESULT = 200
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
+
+        const val succes = "SUCCES"
+        const val info = "INFO"
+        const val warning = "WARNING"
     }
 }

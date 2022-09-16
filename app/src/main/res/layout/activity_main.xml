@@ -74,7 +74,8 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                  android:layout_gravity="center"
-                 android:text="@string/lorem_ipsum_dolor_is_amet"
+                  android:textAlignment="center"
+                  android:text="@string/lorem_ipsum_dolor_is_amet"
                  android:textColor="@color/black"
                  android:textSize="18sp"
                  />
