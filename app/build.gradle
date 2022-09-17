@@ -56,6 +56,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
     //motion toast
     implementation 'com.github.Spikeysanju:MotionToast:1.4'
+    //koin
+    implementation "io.insert-koin:koin-android:3.2.0"
 
 
 

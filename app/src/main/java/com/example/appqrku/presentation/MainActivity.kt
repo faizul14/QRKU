@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
@@ -25,6 +26,7 @@ import com.maxkeppeler.sheets.info.InfoSheet
 import com.maxkeppeler.sheets.options.DisplayMode
 import com.maxkeppeler.sheets.options.Option
 import com.maxkeppeler.sheets.options.OptionsSheet
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import www.sanju.motiontoast.MotionToast
 import www.sanju.motiontoast.MotionToastStyle
 
@@ -32,7 +34,8 @@ import www.sanju.motiontoast.MotionToastStyle
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
     private lateinit var codeScanner : CodeScanner
-    private lateinit var viewModel : MainVIewModel
+//    private lateinit var viewModel : MainVIewModel
+    val viewModel : MainVIewModel by viewModel<MainVIewModel>( )
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +56,8 @@ class MainActivity : AppCompatActivity() {
 
 
         //view model
-        val factory = ViewModelFactory.getInstance()
-        viewModel = ViewModelProvider(this, factory)[MainVIewModel::class.java]
+//        val factory = ViewModelFactory.getInstance()
+//        viewModel = ViewModelProvider(this, factory)[MainVIewModel::class.java]
 
         viewModel.result.observe(this){resultQR->
             binding.txtResultScann.text = resultQR.result
@@ -95,9 +98,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun test(){
-        viewModel.setData("test send data after clean archtitecture")
-    }
 
     private fun infoSheet(msg : String){
         InfoSheet().show(this){
