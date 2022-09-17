@@ -1,18 +1,14 @@
-package com.example.appqrku
+package com.example.appqrku.presentation
 
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Window
 import android.view.WindowInsets
-import android.view.WindowManager
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -22,7 +18,9 @@ import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
+import com.example.appqrku.R
 import com.example.appqrku.databinding.ActivityMainBinding
+import com.example.appqrku.helper.ViewModelFactory
 import com.maxkeppeler.sheets.info.InfoSheet
 import com.maxkeppeler.sheets.options.DisplayMode
 import com.maxkeppeler.sheets.options.Option
@@ -54,12 +52,12 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
         //view model
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[MainVIewModel::class.java]
+        val factory = ViewModelFactory.getInstance()
+        viewModel = ViewModelProvider(this, factory)[MainVIewModel::class.java]
 
         viewModel.result.observe(this){resultQR->
-            binding.txtResultScann.text = resultQR.toString()
+            binding.txtResultScann.text = resultQR.result
         }
         //QR
         codeScanner = CodeScanner(this, binding.scannerView)
@@ -95,6 +93,10 @@ class MainActivity : AppCompatActivity() {
             viewModel.setData("...")
 
         }
+    }
+
+    private fun test(){
+        viewModel.setData("test send data after clean archtitecture")
     }
 
     private fun infoSheet(msg : String){
@@ -166,7 +168,7 @@ class MainActivity : AppCompatActivity() {
                     MotionToast.LONG_DURATION,
                     ResourcesCompat.getFont(this, www.sanju.motiontoast.R.font.helvetica_regular))
             }
-            info-> {
+            info -> {
                 MotionToast.createToast(this,
                     "INFO",
                     "Succes Copy!",
